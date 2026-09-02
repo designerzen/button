@@ -117,7 +117,8 @@
     grid-template-areas:
         "icon"
         "text";
-    gap:var(--gap);
+    
+    gap:calc(2 * var(--gap)) calc(var(--gap));
    
     /* grid-template-columns: var(--padding) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto)  var(--padding);
    
@@ -199,6 +200,8 @@
     font-size: var(--font-size);
     font-weight: 600;
     letter-spacing: 0.5px;
+    /* This cuts the padding to right next to the text for better uniformity */
+    text-box:trim-both cap alphabetic;
 
     text-align: center;
     white-space: normal;
