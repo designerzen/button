@@ -33,8 +33,8 @@
     --depth:5px;
 
     /* //  font-size: max(1.5em, 1.23em + 2cqi); */
-    --font-size: clamp(0.75rem, calc(0.6rem + 3.5cqi), 1.4rem);
-    --icon-size: clamp(1rem, calc(0.8rem + 4.5cqw), 1.2rem);
+    --font-size: clamp(0.95rem, calc(0.9rem + 0.25vw), 1.1rem);
+    --icon-size: 1.15rem;
     
     /* Focus ring properties */
     --focus-ring-width: 3px;
@@ -50,8 +50,8 @@
     --color-primary-dark: oklch(var(--lightness-dark) var(--oklch-saturation) calc(var(--oklch-hue) * 1deg));
     --color-primary-darker: oklch(var(--lightness-darker) var(--oklch-saturation) calc(var(--oklch-hue) * 1deg));
 
-    --color-accent: oklch(var(--accent-lightness) var(--accent-saturation) var(--accent-hue));
-    --color-accent-light: oklch(var(--accent-lightness-light) 0.15 var(--accent-hue));
+    --color-accent: oklch(var(--accent-lightness) var(--accent-saturation) calc(var(--accent-hue) * 1deg));
+    --color-accent-light: oklch(var(--accent-lightness-light) 0.15 calc(var(--accent-hue) * 1deg));
     
     
     --border-color: var(--color-primary);
@@ -94,11 +94,10 @@
     --shadow-color-focus: light-dark(rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.3));
     
     /* Text colors based on background contrast */
-    --text-color: contrast-color(var(--bg-color));
-
-    --text-color-hover: contrast-color(var(--bg-color-hover));
-    --text-color-active: contrast-color(var(--bg-color-active));
-    --text-shadow: 0 var(--depth) 0 contrast-color(var(--text-color));
+    --text-color: #ffffff;
+    --text-color-hover: #ffffff;
+    --text-color-active: #ffffff;
+    --text-shadow: 0 min(var(--depth), 3px) 0 rgba(0, 0, 0, 0.55);
 }
 
 .button {
@@ -106,19 +105,15 @@
     -webkit-appearance: none;
 
     display: inline-grid;
-    flex-shrink: 0;
-    flex-grow: 1;
     min-width: 0;
 
     container-type: inline-size;
     container-name: button;
 
-    grid-template-columns: 1fr;
-    grid-template-areas:
-        "icon"
-        "text";
+    grid-template-columns: auto minmax(0, auto);
+    grid-template-areas: "icon text";
     
-    gap:calc(2 * var(--gap)) calc(var(--gap));
+    gap: var(--gap);
    
     /* grid-template-columns: var(--padding) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto)  var(--padding);
    
@@ -204,10 +199,8 @@
     text-box:trim-both cap alphabetic;
 
     text-align: center;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: normal;
-    hyphens: auto;
+    white-space: nowrap;
+    overflow: hidden;
     
     cursor: pointer;
     transition: transform 45ms cubic-bezier(0.2, 0, 0.38, 0.9);
@@ -379,6 +372,30 @@
             grid-template-columns: minmax(0, 1fr) auto;
             text-align: right;
         }
+    }
+}
+
+.button.align-left {
+    grid-template-columns: auto minmax(0, 1fr);
+    text-align: left;
+}
+
+.button.align-right {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "text icon";
+    text-align: right;
+}
+
+.button.ghost {
+    color: var(--color-primary-dark);
+    background-color: transparent;
+    background-image: none;
+    text-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .button.ghost {
+        color: var(--color-primary-light);
     }
 }
 
