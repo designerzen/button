@@ -1,6 +1,8 @@
 /* CSS Variables for Button Configuration */
 :root {
 
+    color-scheme: light dark;
+
     --icon: url('./icon.svg');
 
     /* Colours */
@@ -29,6 +31,8 @@
     --border-radius: calc( var(--unit) );
     --border-size: 3px;
     --padding:  calc( var(--unit) )  calc( 2 * var(--unit) );
+    --padding-block: var(--unit);
+    --padding-inline: calc(2 * var(--unit));
     --gap: calc( var(--unit) );
     --depth:5px;
 
@@ -93,11 +97,23 @@
     --shadow-color-inset: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.15));
     --shadow-color-focus: light-dark(rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.3));
     
-    /* Text colors based on background contrast */
-    --text-color: #ffffff;
-    --text-color-hover: #ffffff;
-    --text-color-active: #ffffff;
-    --text-shadow: 0 min(var(--depth), 3px) 0 rgba(0, 0, 0, 0.55);
+    /* Theme-tinted black/white fallbacks for browsers without contrast-color(). */
+    --themed-white: color-mix(in oklch, white 88%, var(--color-primary-light));
+    --themed-black: color-mix(in oklch, black 88%, var(--color-primary-darker));
+    --text-color: light-dark(var(--themed-black), var(--themed-white));
+    --text-color-hover: var(--themed-white);
+    --text-color-active: light-dark(var(--themed-white), var(--themed-black));
+    --text-shadow-color: color-mix(in oklch, var(--text-color) 25%, transparent);
+    --text-shadow: 0 min(var(--depth), 3px) 0 var(--text-shadow-color);
+}
+
+/* Choose the accessible pole, then tint it into the active palette. */
+@supports (color: contrast-color(red)) {
+    :root {
+        --text-color: color-mix(in oklch, contrast-color(var(--bg-color)) 88%, var(--bg-color));
+        --text-color-hover: color-mix(in oklch, contrast-color(var(--bg-color-hover)) 88%, var(--bg-color-hover));
+        --text-color-active: color-mix(in oklch, contrast-color(var(--bg-color-active)) 88%, var(--bg-color-active));
+    }
 }
 
 .button {
@@ -110,36 +126,15 @@
     container-type: inline-size;
     container-name: button;
 
-    grid-template-columns: auto minmax(0, auto);
-    grid-template-areas: "icon text";
-    
-    gap: var(--gap);
-   
-    /* grid-template-columns: var(--padding) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto)  var(--padding);
-   
-    grid-template-rows:  
-        var(--padding) 
-        minmax(0, auto) 
-        var(--padding) 
-        minmax(0, auto) 
-        var(--padding); */
-
-    /* 8 x 5 grid with icon and content areas
-    grid-template-columns: var(--padding) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto) minmax(0, auto)  var(--padding);
-    grid-template-rows:  
-        var(--padding) 
-        minmax(0, auto) 
-        var(--padding) 
-        minmax(0, auto) 
-        var(--padding);
-
-    grid-template-areas: 
-       " .       .          .           .           .           .           .           . "
-       " .       icon       icon        icon        icon        icon        icon        . "
-       " .       .          .           .           .           .           .           . "
-       " .       text       text        text        text        text        text        . "
-       " .       .          .           .           .           .           .           . "
-    ; */
+    /* Seven columns and five rows: padding, icon, gap, content, padding. */
+    grid-template-columns: var(--padding-inline) var(--icon-size) var(--gap) repeat(3, minmax(0, auto)) var(--padding-inline);
+    grid-template-rows: var(--padding-block) 0 minmax(1lh, auto) 0 var(--padding-block);
+    grid-template-areas:
+        ". .    .   .    .    .    ."
+        ". icon .   text text text ."
+        ". icon gap text text text ."
+        ". icon .   text text text ."
+        ". .    .   .    .    .    .";
     
     /* We ALWAYS will need the icon centred */
     justify-items: center;
@@ -148,7 +143,7 @@
     align-content: center;
 
     /* Sizing from iOS accessibility guidelines */
-    padding:var(--padding);
+    padding: 0;
     min-height: 44px;
     min-width: 44px;
     background-color: var(--bg-color);
@@ -222,28 +217,35 @@
     place-self: center;
     width: var(--icon-size);
     height: var(--icon-size);
-    background-image: var(--icon);
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
 }
 
 .button::before {
     transform: none;
     /* transform: translateY( -1 * var(--depth,2px)); */
-    filter:grayscale() brightness(9999) invert() drop-shadow( var(--text-shadow) );
+    filter: drop-shadow(var(--text-shadow));
     z-index: 2;
 }
 
 .button::after {
     transform: translateY(calc( var(--depth,2px)) );
-    filter:grayscale() brightness(0) drop-shadow();
+    background-color: color-mix(in oklch, currentColor 65%, black);
     z-index: 1;
+}
+
+.button__label {
+    grid-area: text;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Hover state - strong visual indicator */
 .button:hover {
     background-color: var(--bg-color-hover);
+    color: var(--text-color-hover);
     background-image:
         var(--bg-gradient-hover, var(--bg-gradient-hover-fallback)),
         var(--bg-gradient-hover, var(--bg-gradient-hover-fallback)),
@@ -285,6 +287,7 @@
 /* Active state - strong visual indicator */
 .button:active {
     background-color: var(--bg-color-active);
+    color: var(--text-color-active);
     /* background-image:
         var(--bg-gradient-active, var(--bg-gradient-active-fallback)),
         var(--bg-gradient-active, var(--bg-gradient-active-fallback)),
@@ -317,14 +320,16 @@
 }
 
 /* Focus-visible state - strong visual indicator */
-.button:focus-visible {
+.button:focus-visible,
+.button:focus-within {
     outline: var(--focus-ring-width) solid var(--color-accent);
     outline-offset: var(--focus-ring-offset);
     box-shadow: 0 0 0 calc(var(--focus-ring-width) + 2px) var(--shadow-color-focus);
 }
 
 /* Combine focus-visible and hover for better UX */
-.button:focus-visible:hover {
+.button:focus-visible:hover,
+.button:focus-within:hover {
     box-shadow: 
         0 8px 16px var(--shadow-color-normal),
         0 0 0 var(--focus-ring-width) var(--color-accent);
@@ -347,42 +352,46 @@
 @container button-parent (max-width: 128px) {
     .button {
         --icon-size: clamp(1rem, calc(0.8rem + 4.5cqw), 1.2rem);
-        grid-template-columns: 1fr;
-        grid-template-areas:"icon";
-        font-size: 0;
-        color:transparent;
+        grid-template-columns: var(--padding-inline) repeat(5, minmax(0, 1fr)) var(--padding-inline);
+        grid-template-areas:
+            ". .    .    .    .    .    ."
+            ". icon icon icon icon icon ."
+            ". icon icon icon icon icon ."
+            ". icon icon icon icon icon ."
+            ". .    .    .    .    .    .";
     }
+
+    .button__label { display: none; }
 }
 
 /* One line with icon + text */
 @container button-parent (min-width: 18rem) {
     .button {
         --icon-size: clamp(1rem, calc(0.8rem + 4.5cqw), 1.2rem);
-        grid-template-columns: auto;
-        grid-template-areas: "icon text";
-
         &.left,
         &.align-left{
-            grid-template-columns: auto minmax(0, 1fr);
             text-align: left;
         }
 
         &.right,
         &.align-right{
-            grid-template-columns: minmax(0, 1fr) auto;
             text-align: right;
         }
     }
 }
 
 .button.align-left {
-    grid-template-columns: auto minmax(0, 1fr);
     text-align: left;
 }
 
 .button.align-right {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "text icon";
+    grid-template-columns: var(--padding-inline) repeat(3, minmax(0, auto)) var(--gap) var(--icon-size) var(--padding-inline);
+    grid-template-areas:
+        ". .    .    .    .   .    ."
+        ". text text text .   icon ."
+        ". text text text gap icon ."
+        ". text text text .   icon ."
+        ". .    .    .    .   .    .";
     text-align: right;
 }
 
