@@ -10,8 +10,8 @@ Use light-dark() to select the correct color-space for the button background
 
 Use contrast-color() for the button text
 
-the button should use display:inline-grid
-and have 7 columns and 5 rows
+The button uses display:inline-grid with an icon column and a plain text column.
+No inner label element is required: `<button class="button">Click Me</button>`.
 
 the border-radius is a css-var as is the border size
 

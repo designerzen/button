@@ -34,7 +34,7 @@
     /* We try and use the size of the text to make the padding perfect */
     --padding:  calc( var(--unit) )  calc( 2 * var(--unit) );
     --padding-block: var(--unit);
-    --padding-inline: calc( (1lh - 1cap) / 2 * var(--padding-block, var(--unit)));
+    --padding-inline: calc((1lh - 1cap) / 2 + var(--padding-block, var(--unit)));
     
     --gap: calc( var(--unit) );
     --depth:5px;
@@ -125,20 +125,11 @@
     -webkit-appearance: none;
 
     display: inline-grid;
-    min-width: 0;
-
-    container-type: inline-size;
-    container-name: button;
-
-    /* Seven columns and five rows: padding, icon, gap, content, padding. */
-    grid-template-columns: var(--padding-inline) var(--icon-size) var(--gap) repeat(3, minmax(0, auto)) var(--padding-inline);
-    grid-template-rows: var(--padding-block) 0 minmax(1lh, auto) 0 var(--padding-block);
-    grid-template-areas:
-        ". .    .   .    .    .    ."
-        ". icon .   text text text ."
-        ". icon gap text text text ."
-        ". icon .   text text text ."
-        ". .    .   .    .    .    .";
+    /* Plain button text fills the free cell beside the layered icon. */
+    grid-template-columns: var(--icon-size) minmax(0, auto);
+    grid-template-rows: minmax(1lh, auto);
+    grid-template-areas: "icon text";
+    column-gap: var(--gap);
     
     /* We ALWAYS will need the icon centred */
     justify-items: center;
@@ -146,7 +137,7 @@
     justify-content: center;
     align-content: center;
 
-   padding: 0; /* padding is set as grid rows / cols */
+    padding: var(--padding-block) var(--padding-inline);
 
     /* Sizing from iOS accessibility guidelines */
     min-height: 44px;
@@ -172,12 +163,12 @@
         repeat;
 
     background-origin:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
     background-clip:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
@@ -256,12 +247,12 @@
         repeat;
 
     background-origin:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
     background-clip:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
@@ -298,12 +289,12 @@
         repeat;
 
     background-origin:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
     background-clip:
-        content-box,
+        padding-box,
         padding-box,
         border-box;
 
@@ -347,20 +338,6 @@
 
 /* Responsive adjustments */
 
-/* Just Icon */
-@container button-parent (max-width: 128px) {
-    .button {
-        --icon-size: clamp(1rem, calc(0.8rem + 4.5cqw), 1.2rem);
-        grid-template-columns: var(--padding-inline) repeat(5, minmax(0, 1fr)) var(--padding-inline);
-        grid-template-areas:
-            ". .    .    .    .    .    ."
-            ". icon icon icon icon icon ."
-            ". icon icon icon icon icon ."
-            ". icon icon icon icon icon ."
-            ". .    .    .    .    .    .";
-    }
-}
-
 /* One line with icon + text */
 @container button-parent (min-width: 18rem) {
     .button {
@@ -378,18 +355,33 @@
 }
 
 .button.align-left {
+    grid-template-columns: var(--icon-size) minmax(0, 1fr);
+    justify-items: start;
     text-align: left;
 }
 
 .button.align-right {
-    grid-template-columns: var(--padding-inline) repeat(3, minmax(0, auto)) var(--gap) var(--icon-size) var(--padding-inline);
-    grid-template-areas:
-        ". .    .    .    .   .    ."
-        ". text text text .   icon ."
-        ". text text text gap icon ."
-        ". text text text .   icon ."
-        ". .    .    .    .   .    .";
+    grid-template-columns: minmax(0, 1fr) var(--icon-size);
+    grid-template-areas: "text icon";
+    justify-items: end;
     text-align: right;
+}
+
+/* Just Icon */
+@container button-parent (max-width: 128px) {
+    .button,
+    .button.align-left,
+    .button.align-right {
+        --icon-size: clamp(1rem, calc(0.8rem + 4.5cqw), 1.2rem);
+        /* Keep the text as the accessible name while showing only the icon. */
+        font-size: 0;
+        letter-spacing: 0;
+        column-gap: 0;
+        grid-template-columns: var(--icon-size) 0;
+        grid-template-rows: var(--icon-size);
+        grid-template-areas: "icon text";
+        padding-inline: var(--padding-block);
+    }
 }
 
 .button.ghost {
