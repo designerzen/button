@@ -30,15 +30,19 @@
     --unit:12px;
     --border-radius: calc( var(--unit) );
     --border-size: 3px;
+
+    /* We try and use the size of the text to make the padding perfect */
     --padding:  calc( var(--unit) )  calc( 2 * var(--unit) );
     --padding-block: var(--unit);
-    --padding-inline: calc(2 * var(--unit));
+    --padding-inline: calc( (1lh - 1cap) / 2 * var(--padding-block, var(--unit)));
+    
     --gap: calc( var(--unit) );
     --depth:5px;
 
-    /* //  font-size: max(1.5em, 1.23em + 2cqi); */
+    /*  font-size: max(1.5em, 1.23em + 2cqi); */
     --font-size: clamp(0.95rem, calc(0.9rem + 0.25vw), 1.1rem);
-    --icon-size: 1.15rem;
+    /* 1.15rem; */
+    --icon-size:1lh; 
     
     /* Focus ring properties */
     --focus-ring-width: 3px;
@@ -142,8 +146,9 @@
     justify-content: center;
     align-content: center;
 
+   padding: 0; /* padding is set as grid rows / cols */
+
     /* Sizing from iOS accessibility guidelines */
-    padding: 0;
     min-height: 44px;
     min-width: 44px;
     background-color: var(--bg-color);
@@ -190,6 +195,7 @@
     font-size: var(--font-size);
     font-weight: var( --font-weight, 600 );
     letter-spacing: 0.5px;
+    
     /* This cuts the padding to right next to the text for better uniformity */
     text-box:trim-both cap alphabetic;
 
@@ -233,13 +239,6 @@
     transform: translateY(calc( var(--depth,2px)) );
     background-color: color-mix(in oklch, currentColor 65%, black);
     z-index: 1;
-}
-
-.button__label {
-    grid-area: text;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* Hover state - strong visual indicator */
@@ -360,8 +359,6 @@
             ". icon icon icon icon icon ."
             ". .    .    .    .    .    .";
     }
-
-    .button__label { display: none; }
 }
 
 /* One line with icon + text */
