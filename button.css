@@ -127,7 +127,9 @@
 
     display: inline-grid;
     /* Both icon layers sit in "icon"; the bare text node auto-places into the free "text" cell. */
-    grid-template-columns: var(--icon-size) minmax(0, auto);
+    /* Icon side and text alignment are independent: see .icon-right and .align-* */
+    --text-track: minmax(0, auto);
+    grid-template-columns: var(--icon-size) var(--text-track);
     grid-template-rows: minmax(1lh, auto);
     grid-template-areas: "icon text";
     column-gap: var(--gap);
@@ -356,15 +358,21 @@
     }
 }
 
+/* Icon side: left is the default, .icon-left is there for clarity */
+.button.icon-right {
+    grid-template-columns: var(--text-track) var(--icon-size);
+    grid-template-areas: "text icon";
+}
+
+/* Text alignment: the text track grows so the label can sit at either edge */
 .button.align-left {
-    grid-template-columns: var(--icon-size) minmax(0, 1fr);
+    --text-track: minmax(0, 1fr);
     justify-items: start;
     text-align: left;
 }
 
 .button.align-right {
-    grid-template-columns: minmax(0, 1fr) var(--icon-size);
-    grid-template-areas: "text icon";
+    --text-track: minmax(0, 1fr);
     justify-items: end;
     text-align: right;
 }
